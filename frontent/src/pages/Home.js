@@ -13,10 +13,9 @@ export default function Home() {
     connectWallet();
   }, []);
 
-  // ✅ Connect MetaMask and Load Contract
   const connectWallet = async () => {
     if (!window.ethereum) {
-      setError("❌ MetaMask not detected. Please install MetaMask.");
+      setError("MetaMask not detected. Please install MetaMask.");
       return;
     }
 
@@ -34,39 +33,44 @@ export default function Home() {
       const investmentContract = new Contract(contractAddress, contractAbi, signer);
       setContract(investmentContract);
 
-      // Load Balance
       const userBalance = await investmentContract.getInvestment(userAddress);
       setBalance(formatUnits(userBalance, 18));
     } catch (error) {
-      setError(`❌ Error connecting: ${error.message}`);
+      setError(`Connection failed: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
-      <div className="bg-white shadow-xl rounded-lg p-6 w-96 text-center text-gray-800">
-        <h1 className="text-2xl font-bold mb-4 text-indigo-600">Smart Investment</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-lg p-6 space-y-6">
+        <h1 className="text-2xl font-semibold text-gray-800 text-center">
+          Smart Investment
+        </h1>
 
         {account ? (
-          <div className="p-4 bg-gray-100 rounded-lg">
-            <p className="text-gray-700 font-semibold mb-2">Connected Wallet:</p>
-            <p className="text-blue-500 font-mono">{account}</p>
-            <p className="mt-4 text-gray-700 font-semibold">Your Investment:</p>
-            <p className="text-green-600 font-bold text-xl">{balance} VT Tokens</p>
+          <div className="space-y-4 text-center">
+            <div>
+              <p className="text-sm text-gray-500">Connected Wallet</p>
+              <p className="font-mono text-blue-600 break-words">{account}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Your Investment</p>
+              <p className="text-xl font-bold text-emerald-600">{balance} VT Tokens</p>
+            </div>
           </div>
         ) : (
           <button
             onClick={connectWallet}
-            className="w-full py-2 px-4 mt-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 ease-in-out"
             disabled={loading}
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-200"
           >
             {loading ? "Connecting..." : "Connect Wallet"}
           </button>
         )}
 
-        {error && <p className="text-red-500 mt-3 text-sm">{error}</p>}
+        {error && <p className="text-sm text-red-500 text-center">{error}</p>}
       </div>
     </div>
   );

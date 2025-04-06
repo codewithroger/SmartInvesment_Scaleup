@@ -1,4 +1,4 @@
-export const CONTRACT_ADDRESS = "0x72d073D2363Fa3Bab53Fca35Fc4a5dd20946E8d1"; // Replace with actual deployed address
+export const CONTRACT_ADDRESS = "0x4291892b67Ce9B37D04577e071681fa80657D67D"; // Replace with actual deployed address
 
 export const CONTRACT_ABI =  [
     {

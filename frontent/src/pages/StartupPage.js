@@ -1,52 +1,64 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { ethers } from "ethers";
-import { contractAddress } from "../Constant/contractAddress";
-import contractABI from "../contractABI.json";
+import React, { useState } from "react";
+import AddStartupForm from "../pages/Startup/AddStartup.jsx";
+import FundTransactions from "../pages/Startup/FundTransactions.jsx";
+import Expenditure from "../pages/Startup/Expenditure.jsx";
+import { motion } from "framer-motion";
+
+const tabs = [
+    { id: "addStartup", label: "➕ Add Startup" },
+    { id: "fundTransactions", label: "💰 Fund Transactions" },
+    { id: "expenditure", label: "📊 Expenditure" },
+];
 
 const StartupPage = () => {
-    const [fundsReceived, setFundsReceived] = useState("0");
-    const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState("addStartup");
 
-    const fetchReceivedFunds = useCallback(async () => {
-        if (!window.ethereum) {
-            alert("Please install MetaMask to continue.");
-            return;
+    const renderContent = () => {
+        switch (activeTab) {
+            case "addStartup":
+                return <AddStartupForm />;
+            case "fundTransactions":
+                return <FundTransactions />;
+            case "expenditure":
+                return <Expenditure />;
+            default:
+                return <AddStartupForm />;
         }
-
-        setLoading(true);
-        try {
-            const provider = new ethers.BrowserProvider(window.ethereum);
-            const signer = await provider.getSigner();
-            const contract = new ethers.Contract(contractAddress, contractABI, signer);
-
-            const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-
-            // Fetch funds using the getBalance function
-            const balance = await contract.getBalance(accounts[0]);
-            setFundsReceived(ethers.formatEther(balance));
-        } catch (error) {
-            console.error("Fetch Funds Error:", error);
-            alert("Failed to fetch received funds.");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        fetchReceivedFunds();
-    }, [fetchReceivedFunds]);
+    };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
-            <h1 className="text-3xl font-bold mb-6">Startup Page</h1>
-            <p className="text-lg">Total Funds Received: {loading ? "Loading..." : `${fundsReceived} ETH`}</p>
-            <button
-                onClick={fetchReceivedFunds}
-                className="mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded disabled:opacity-50"
-                disabled={loading}
-            >
-                {loading ? "Refreshing..." : "Refresh Funds"}
-            </button>
+        <div className="flex min-h-screen bg-gray-900 text-white">
+            {/* Sidebar */}
+            <aside className="w-64 bg-gray-800 p-6 border-r border-gray-700">
+                <h2 className="text-2xl font-bold text-blue-400 mb-8">Startup Dashboard</h2>
+                <nav className="flex flex-col space-y-3">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`text-left px-4 py-2 rounded-lg transition-colors duration-200 ${
+                                activeTab === tab.id
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            }`}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </nav>
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 p-8 overflow-y-auto">
+                <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    {renderContent()}
+                </motion.div>
+            </main>
         </div>
     );
 };
