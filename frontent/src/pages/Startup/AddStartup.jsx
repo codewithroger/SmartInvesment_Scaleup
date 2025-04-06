@@ -9,6 +9,7 @@ const AddStartupForm = () => {
         description: "",
         industry: "",
         address: "",
+        hasPatent: "", // new dropdown field
     });
 
     const [loading, setLoading] = useState(false);
@@ -23,6 +24,12 @@ const AddStartupForm = () => {
         setLoading(true);
         setMessage("");
 
+        if (startup.hasPatent !== "yes") {
+            setMessage("❌ Only startups with a patent can be registered.");
+            setLoading(false);
+            return;
+        }
+
         try {
             const response = await axios.post("http://localhost:5000/api/startups", startup);
             if (response.status === 201) {
@@ -33,6 +40,7 @@ const AddStartupForm = () => {
                     description: "",
                     industry: "",
                     address: "",
+                    hasPatent: "",
                 });
             } else {
                 setMessage("⚠️ Failed to add startup.");
@@ -55,6 +63,7 @@ const AddStartupForm = () => {
             <h2 className="text-2xl font-bold mb-6 text-white">Add New Startup</h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Startup Name */}
                 <div>
                     <label className="block mb-1 text-sm text-gray-300">Startup Name</label>
                     <input
@@ -68,6 +77,7 @@ const AddStartupForm = () => {
                     />
                 </div>
 
+                {/* Founder Name */}
                 <div>
                     <label className="block mb-1 text-sm text-gray-300">Founder Name</label>
                     <input
@@ -81,6 +91,7 @@ const AddStartupForm = () => {
                     />
                 </div>
 
+                {/* Industry */}
                 <div>
                     <label className="block mb-1 text-sm text-gray-300">Industry</label>
                     <input
@@ -94,6 +105,7 @@ const AddStartupForm = () => {
                     />
                 </div>
 
+                {/* Description */}
                 <div>
                     <label className="block mb-1 text-sm text-gray-300">Description</label>
                     <textarea
@@ -107,6 +119,7 @@ const AddStartupForm = () => {
                     ></textarea>
                 </div>
 
+                {/* Wallet Address */}
                 <div>
                     <label className="block mb-1 text-sm text-gray-300">Wallet Address</label>
                     <input
@@ -121,6 +134,26 @@ const AddStartupForm = () => {
                     <p className="text-xs text-gray-400 mt-1">Make sure this is a valid Ethereum address.</p>
                 </div>
 
+                {/* Patent Dropdown */}
+                <div>
+                    <label className="block mb-1 text-sm text-gray-300">Do you have a patent?</label>
+                    <select
+                        name="hasPatent"
+                        value={startup.hasPatent}
+                        onChange={handleChange}
+                        className="w-full p-2 bg-gray-700 text-white rounded border border-gray-600"
+                        required
+                    >
+                        <option value="">-- Select an option --</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                    <p className="text-xs text-gray-400 mt-1">
+                        Only startups with a patent are eligible.
+                    </p>
+                </div>
+
+                {/* Submit */}
                 <button
                     type="submit"
                     disabled={loading}
@@ -132,6 +165,7 @@ const AddStartupForm = () => {
                 </button>
             </form>
 
+            {/* Message */}
             {message && (
                 <div
                     className={`mt-4 text-center font-medium ${
